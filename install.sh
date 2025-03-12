@@ -4,7 +4,7 @@
 # Modified by : Delari (https://github.com/xavatar/yiimp_install_scrypt)
 
 # Program:
-#   Install yiimp on Ubuntu 16.04/18.04 running Nginx, MariaDB, and php7.3
+#   Install yiimp on Ubuntu 22.04 running Nginx, MariaDB, and php7.3
 #   v0.3 (update May, 2022)
 #
 ################################################################################
@@ -44,8 +44,8 @@
     clear
     echo
     echo -e "$GREEN************************************************************************$COL_RESET"
-    echo -e "$GREEN Yiimp Install Script v0.3 $COL_RESET"
-    echo -e "$GREEN Install yiimp on Ubuntu 16.04/18.04 running Nginx, MariaDB, and php8.1 $COL_RESET"
+    echo -e "$GREEN Yiimp Install Script v0.5 $COL_RESET"
+    echo -e "$GREEN Install yiimp on Ubuntu 22.04 running Nginx, Mysql, and php8.1 $COL_RESET"
     echo -e "$GREEN************************************************************************$COL_RESET"
     echo
     sleep 3
@@ -139,24 +139,32 @@
     ' | sudo -E tee /etc/nginx/blockuseragents.rules >/dev/null 2>&1
 
 
-    # Installing Mariadb
+    # Installing MySQL
     echo
     echo
-    echo -e "$CYAN => Installing Mariadb Server : $COL_RESET"
+    echo -e "$CYAN => Installing MySQL Server : $COL_RESET"
     echo
     sleep 3
 
-    # Create random password
+    # Set the root password
     rootpasswd=$(openssl rand -base64 12)
-    export DEBIAN_FRONTEND="noninteractive"
-    sudo apt -y install mariadb-server
-    sudo systemctl enable mariadb.service
-    sudo systemctl start mariadb.service
+    export DEBIAN_FRONTEND=noninteractive
+    sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $rootpasswd"
+    sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $rootpasswd"
+
+    # Install MySQL Server
+    sudo apt-get update
+    sudo apt-get -y install mysql-server
+
+    # Start and enable MySQL service
+    sudo systemctl enable mysql.service
+    sudo systemctl start mysql.service
     sleep 5
-    sudo systemctl status mariadb | sed -n "1,3p"
+    sudo systemctl status mysql | sed -n "1,3p"
     sleep 15
     echo
     echo -e "$GREEN Done...$COL_RESET"
+
 
 
     # Installing Installing php7.3
@@ -921,19 +929,18 @@
     Q2="GRANT ALL ON *.* TO 'panel'@'localhost' IDENTIFIED BY '$password';"
     Q3="FLUSH PRIVILEGES;"
     SQL="${Q1}${Q2}${Q3}"
-    sudo mysql -u root -p="" -e "$SQL"
+    sudo mysql -u root -p"$rootpasswd" -e "$SQL"
 
     # Create stratum user
     Q1="GRANT ALL ON *.* TO 'stratum'@'localhost' IDENTIFIED BY '$password2';"
     Q2="FLUSH PRIVILEGES;"
     SQL="${Q1}${Q2}"
-    sudo mysql -u root -p="" -e "$SQL"
+    sudo mysql -u root -p"$rootpasswd" -e "$SQL"
 
-    #Create my.cnf
-
+    # Create my.cnf
     echo '
     [clienthost1]
-    user=panel
+        user=panel
     password='"${password}"'
     database=yiimpfrontend
     host=localhost
@@ -949,7 +956,8 @@
     user=root
     password='"${rootpasswd}"'
     ' | sudo -E tee ~/.my.cnf >/dev/null 2>&1
-      sudo chmod 0600 ~/.my.cnf
+    sudo chmod 0600 ~/.my.cnf
+
 
 
     # Create keys file
@@ -1257,7 +1265,7 @@ echo -e "$GREEN Done...$COL_RESET"
     echo
     echo
     echo -e "$GREEN***************************$COL_RESET"
-    echo -e "$GREEN Yiimp Install Script v0.2 $COL_RESET"
+    echo -e "$GREEN Yiimp Install Script v0.5 $COL_RESET"
     echo -e "$GREEN Finish !!! $COL_RESET"
     echo -e "$GREEN***************************$COL_RESET"
     echo
