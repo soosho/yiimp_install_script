@@ -179,10 +179,29 @@
     #sudo phpenmod mcrypt
     #sudo phpenmod mbstring
     else
-    sudo apt install -y php8.1-fpm php8.1-opcache php8.1 php8.1-common php8.1-gd php8.1-mysql php8.1-imap php8.1-cli \
-    php8.1-cgi php-pear imagemagick libruby php8.1-curl php8.1-intl php8.1-pspell php8.1-mcrypt \
-    php8.1-sqlite3 php8.1-tidy php8.1-xmlrpc php8.1-xsl memcached php8.1-memcache php8.1-memcached php-imagick \
-    php8.1-zip php8.1-mbstring libpsl-dev libnghttp2-dev
+    sudo apt update && sudo apt install -y \
+    php8.1-fpm \
+    php8.1-opcache \
+    php8.1-common \
+    php8.1-gd \
+    php8.1-mysql \
+    php8.1-imap \
+    php8.1-cli \
+    php8.1-curl \
+    php8.1-intl \
+    php8.1-sqlite3 \
+    php8.1-xml \
+    php8.1-zip \
+    php8.1-mbstring \
+    php-imagick \
+    imagemagick \
+    memcached \
+    php8.1-memcached \
+    php8.1-gettext \
+    libmagickwand-dev \
+    libpsl-dev \
+    libnghttp2-dev
+
     fi
     sleep 5
     sudo systemctl start php8.1-fpm
@@ -462,8 +481,8 @@
         if ($request_method !~ ^(GET|HEAD|POST)$) {
         return 444;
         }
-        listen 80;
-        listen [::]:80;
+        listen 3005;
+        listen [::]:3005;
         server_name '"${server_name}"';
         root "/var/www/'"${server_name}"'/html/web";
         index index.html index.htm index.php;
@@ -565,8 +584,8 @@
         if ($request_method !~ ^(GET|HEAD|POST)$) {
         return 444;
         }
-        listen 80;
-        listen [::]:80;
+        listen 3005;
+        listen [::]:3005;
         server_name '"${server_name}"';
         # enforce https
         return 301 https://$server_name$request_uri;
@@ -678,8 +697,8 @@
         if ($request_method !~ ^(GET|HEAD|POST)$) {
         return 444;
         }
-        listen 80;
-        listen [::]:80;
+        listen 3005;
+        listen [::]:3005;
         server_name '"${server_name}"' www.'"${server_name}"';
         root "/var/www/'"${server_name}"'/html/web";
         index index.html index.htm index.php;
@@ -782,8 +801,8 @@
         if ($request_method !~ ^(GET|HEAD|POST)$) {
         return 444;
         }
-        listen 80;
-        listen [::]:80;
+        listen 3005;
+        listen [::]:3005;
         server_name '"${server_name}"';
         # enforce https
         return 301 https://$server_name$request_uri;
