@@ -987,7 +987,7 @@
     echo -e "$GREEN Done...$COL_RESET"
 
 
-    # Peforming the SQL import
+   # Performing the SQL import
     echo
     echo
     echo -e "$CYAN => Database 'yiimpfrontend' and users 'panel' and 'stratum' created with password $password and $password2, will be saved for you $COL_RESET"
@@ -999,25 +999,36 @@
     cd ~
     cd yiimp/sql
 
+    # Select the database before importing
+    DB_NAME="yiimpfrontend"
+
+    # Ensure the database exists
+    sudo mysql --defaults-group-suffix=host1 -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+
+    # Set the target database
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME <<EOF
+    USE $DB_NAME;
+    EOF
+
     # Import the initial sql dump
-    sudo zcat 2024-03-06-complete_export.sql.gz | sudo mysql --defaults-group-suffix=host1
+    sudo zcat 2024-03-06-complete_export.sql.gz | sudo mysql --defaults-group-suffix=host1 $DB_NAME
 
     # Import other sql files in order
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-03-18-add_aurum_algo.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-03-29-add_github_version.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-03-31-add_payout_threshold.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-04-01-add_auto_exchange.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-04-01-shares_blocknumber.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-04-05-algos_port_color.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-04-22-add_equihash_algos.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-04-23-add_pers_string.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-04-29-add_sellthreshold.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2024-05-04-add_neoscrypt_xaya_algo.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2025-02-06-add_usemweb.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2025-02-13-add_xelisv2-pepew.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2025-02-23-add_algo_kawpow.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-03-18-add_aurum_algo.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-03-29-add_github_version.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-03-31-add_payout_threshold.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-04-01-add_auto_exchange.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-04-01-shares_blocknumber.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-04-05-algos_port_color.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-04-22-add_equihash_algos.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-04-23-add_pers_string.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-04-29-add_sellthreshold.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2024-05-04-add_neoscrypt_xaya_algo.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2025-02-06-add_usemweb.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2025-02-13-add_xelisv2-pepew.sql
+    sudo mysql --defaults-group-suffix=host1 $DB_NAME --force < 2025-02-23-add_algo_kawpow.sql
 
-echo "SQL imports completed successfully!"
+    echo "SQL imports completed successfully!"
 
 
 
